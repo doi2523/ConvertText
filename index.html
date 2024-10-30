@@ -33,9 +33,6 @@
         .btn-group {
             margin-bottom: 20px;
         }
-        .btn-primary:hover, .btn-secondary:hover, .btn-warning:hover {
-            opacity: 0.9;
-        }
     </style>
 </head>
 <body>
@@ -45,36 +42,40 @@
             <label for="inputText">Nhập dãy chữ (cách nhau bằng dấu phẩy):</label>
             <textarea class="form-control" id="inputText" rows="3"></textarea>
         </div>
+        <p>Chọn kiểu chuyển đổi:</p>
         <div class="d-flex justify-content-start align-items-center">
-            <label>Chọn kiểu chuyển đổi:</label>
             <div class="btn-group ml-3" id="caseSelect" data-toggle="buttons">
-                <label class="btn btn-primary active">
-                    <input type="radio" name="options" id="uppercase" autocomplete="off" checked> Sang chữ hoa
+                <label class="btn btn-secondary rounded">
+                    <input type="radio" name="options" id="uppercase" autocomplete="off"> Sang chữ hoa
                 </label>
-                <label class="btn btn-success mx-2">
+                <label class="btn btn-secondary mx-2 rounded">
                     <input type="radio" name="options" id="lowercase" autocomplete="off"> Sang chữ thường
                 </label>
-                <label class="btn btn-info">
+                <label class="btn btn-secondary mr-2 rounded">
                     <input type="radio" name="options" id="capitalize" autocomplete="off"> Viết hoa chữ cái đầu
+                </label>
+                <label class="btn btn-secondary rounded">
+                    <input type="radio" name="options" id="titlecase" autocomplete="off"> Viết hoa mỗi từ
                 </label>
             </div>
         </div>
-        <button class="btn btn-primary btn-block" id="convertBtn">Chuyển đổi</button>
         <h3 class="mt-4">Kết quả:</h3>
         <div class="result border p-3" id="resultText"></div>
         <button class="btn btn-success mt-2" id="copyBtn" style="display:none;" onclick="copyToClipboard()">Sao chép</button>
     </div>
 
     <script>
-        document.getElementById('convertBtn').addEventListener('click', function() {
+        function convertText() {
             const inputText = document.getElementById('inputText').value;
             const isUppercase = document.getElementById('uppercase').checked;
             const isLowercase = document.getElementById('lowercase').checked;
             const isCapitalize = document.getElementById('capitalize').checked;
+            const isTitleCase = document.getElementById('titlecase').checked;
             let result;
 
             if (inputText.trim() === '') {
-                showAlert("Lỗi!", "Vui lòng nhập dãy chữ!", "error");
+                document.getElementById('resultText').textContent = '';
+                document.getElementById('copyBtn').style.display = 'none';
                 return;
             }
 
@@ -87,11 +88,32 @@
                     item = item.trim();
                     return item.charAt(0).toUpperCase() + item.slice(1).toLowerCase();
                 }).join('\n');
+            } else if (isTitleCase) {
+                result = inputText.split(',').map(item => {
+                    return item.trim().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+                }).join('\n');
             }
 
             const resultTextElement = document.getElementById('resultText');
             resultTextElement.textContent = result;
             document.getElementById('copyBtn').style.display = 'block';
+        }
+
+        document.getElementById('inputText').addEventListener('input', convertText);
+        document.querySelectorAll('input[name="options"]').forEach(input => {
+            input.addEventListener('change', function() {
+                document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('btn-primary', 'btn-success', 'btn-info', 'btn-warning'));
+                if (this.id === 'uppercase') {
+                    this.parentElement.classList.add('btn-info');
+                } else if (this.id === 'lowercase') {
+                    this.parentElement.classList.add('btn-info');
+                } else if (this.id === 'capitalize') {
+                    this.parentElement.classList.add('btn-info');
+                } else if (this.id === 'titlecase') {
+                    this.parentElement.classList.add('btn-info');
+                }
+                convertText();
+            });
         });
 
         function copyToClipboard() {
