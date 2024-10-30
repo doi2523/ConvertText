@@ -5,30 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chuyển đổi Chữ</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"> <!-- Thêm font Roboto -->
     <style>
+        body {
+            background-color: #f8f9fa; /* Màu nền nhẹ nhàng */
+            font-family: 'Roboto', sans-serif; /* Sử dụng font Roboto */
+        }
+        .container {
+            background: #ffffff; /* Nền trắng cho nội dung */
+            border-radius: 10px; /* Bo góc cho khung */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Đổ bóng cho khung */
+            padding: 30px; /* Padding cho khung */
+            margin-top: 50px; /* Khoảng cách từ trên xuống */
+        }
+        h1 {
+            color: #007bff; /* Màu tiêu đề */
+        }
         .result {
             white-space: pre-wrap; /* Để giữ nguyên khoảng trắng và xuống dòng */
             cursor: pointer; /* Thay đổi con trỏ chuột khi di chuột qua kết quả */
+            min-height: 100px; /* Chiều cao tối thiểu cho ô kết quả */
+            background-color: #e9ecef; /* Nền ô kết quả */
+            border: 1px solid #ced4da; /* Đường viền nhẹ cho ô kết quả */
+            border-radius: 5px; /* Bo góc cho ô kết quả */
+        }
+        .btn-group {
+            margin-bottom: 20px; /* Khoảng cách giữa nhóm nút và nút chuyển đổi */
+        }
+
+        .btn-primary:hover, .btn-secondary:hover {
+            opacity: 0.9; /* Tăng độ trong suốt khi hover */
         }
     </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center">Chuyển đổi Chữ</h1>
+    <div class="container">
+        <h1 class="text-center mb-4">Chuyển đổi Chữ và cách dòng tự động</h1>
         <div class="form-group">
             <label for="inputText">Nhập dãy chữ (cách nhau bằng dấu phẩy):</label>
             <textarea class="form-control" id="inputText" rows="3"></textarea>
         </div>
-        <button class="btn btn-primary" id="convertBtn">Chuyển đổi</button>
+        <div class="d-flex justify-content-start align-items-center">
+            <label>Chọn kiểu chuyển đổi:</label>
+            <div class="btn-group ml-3" id="caseSelect" data-toggle="buttons">
+                <label class="btn btn-primary active">
+                    <input type="radio" name="options" id="uppercase" autocomplete="off" checked> Sang chữ hoa
+                </label>
+                <label class="btn btn-secondary">
+                    <input type="radio" name="options" id="lowercase" autocomplete="off"> Sang chữ thường
+                </label>
+            </div>
+        </div>
+        <button class="btn btn-primary btn-block" id="convertBtn">Chuyển đổi</button>
         <h3 class="mt-4">Kết quả:</h3>
-        <div class="result border p-3" id="resultText" onclick="copyToClipboard()"></div>
-        <button class="btn btn-success mt-2" id="copyBtn" style="display:none;">Sao chép</button>
+        <div class="result border p-3" id="resultText"></div>
+        <button class="btn btn-success mt-2" id="copyBtn" style="display:none;" onclick="copyToClipboard()">Sao chép</button>
     </div>
 
     <script>
         document.getElementById('convertBtn').addEventListener('click', function() {
             const inputText = document.getElementById('inputText').value;
-            const result = inputText.split(',').map(item => item.trim().toUpperCase()).join('\n');
+            const isUppercase = document.getElementById('uppercase').checked;
+            let result;
+
+            if (inputText.trim() === '') {
+                alert('Vui lòng nhập dãy chữ!');
+                return; // Không làm gì nếu ô nhập liệu rỗng
+            }
+
+            if (isUppercase) {
+                result = inputText.split(',').map(item => item.trim().toUpperCase()).join('\n');
+            } else {
+                result = inputText.split(',').map(item => item.trim().toLowerCase()).join('\n');
+            }
+
             const resultTextElement = document.getElementById('resultText');
             resultTextElement.textContent = result;
             document.getElementById('copyBtn').style.display = 'block'; // Hiện nút sao chép
@@ -36,6 +86,10 @@
 
         function copyToClipboard() {
             const resultText = document.getElementById('resultText').textContent;
+            if (resultText.trim() === '') {
+                alert('Không có nội dung để sao chép!');
+                return; // Không sao chép nếu ô kết quả rỗng
+            }
             navigator.clipboard.writeText(resultText).then(() => {
                 alert('Đã sao chép vào clipboard!');
             }, (err) => {
