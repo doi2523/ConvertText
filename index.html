@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chuyển đổi Chữ</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .result {
+            white-space: pre-wrap; /* Để giữ nguyên khoảng trắng và xuống dòng */
+            cursor: pointer; /* Thay đổi con trỏ chuột khi di chuột qua kết quả */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Chuyển đổi Chữ</h1>
+        <div class="form-group">
+            <label for="inputText">Nhập dãy chữ (cách nhau bằng dấu phẩy):</label>
+            <textarea class="form-control" id="inputText" rows="3"></textarea>
+        </div>
+        <button class="btn btn-primary" id="convertBtn">Chuyển đổi</button>
+        <h3 class="mt-4">Kết quả:</h3>
+        <div class="result border p-3" id="resultText" onclick="copyToClipboard()"></div>
+        <button class="btn btn-success mt-2" id="copyBtn" style="display:none;">Sao chép</button>
+    </div>
+
+    <script>
+        document.getElementById('convertBtn').addEventListener('click', function() {
+            const inputText = document.getElementById('inputText').value;
+            const result = inputText.split(',').map(item => item.trim().toUpperCase()).join('\n');
+            const resultTextElement = document.getElementById('resultText');
+            resultTextElement.textContent = result;
+            document.getElementById('copyBtn').style.display = 'block'; // Hiện nút sao chép
+        });
+
+        function copyToClipboard() {
+            const resultText = document.getElementById('resultText').textContent;
+            navigator.clipboard.writeText(resultText).then(() => {
+                alert('Đã sao chép vào clipboard!');
+            }, (err) => {
+                console.error('Không thể sao chép: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
